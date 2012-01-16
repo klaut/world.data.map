@@ -36,10 +36,15 @@ path {
 	stroke-width: 0.5;
 }
 
-circle {
+circle.firstLayer {
 	fill: #ef4d0d;
 	opacity:.5;
 
+}
+
+circle.secondLayer {
+	fill: #d456ef;
+	opacity:.5;
 }
 
 circle:hover {
