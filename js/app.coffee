@@ -19,13 +19,14 @@ jQuery ->
 			@render()
 		
 		render: ->
-			data = @collection.toJSON()
 			#get the right scale proportions for this dataset
-			r = d3.scale.linear().domain(@getRange(data)).range([3,30])
+			r = d3.scale.linear().domain(@getDataMinMax()).range([3,30])
 			projection = @parentView.projection
+
+			cities = @collection.toJSON()
 			
 			@cities.selectAll("circle")
-				.data( data )
+				.data( cities )
 				.enter().append("svg:circle")
 				.attr("class", @className )
 				.attr("r", (d) -> r(d.value) )
@@ -35,8 +36,8 @@ jQuery ->
 				.text((d) -> d.city)
 			@
 		
-		getRange: (data) ->
-			values = data.map (city) -> city.value
+		getDataMinMax: ->
+			values = @collection.pluck 'value' #get all value properties from models
 			min = values.reduce (a,b) -> Math.min a,b
 			max = values.reduce (a,b) -> Math.max a,b
 			[min,max]

@@ -46,11 +46,11 @@
       };
 
       CitiesView.prototype.render = function() {
-        var data, projection, r;
-        data = this.collection.toJSON();
-        r = d3.scale.linear().domain(this.getRange(data)).range([3, 30]);
+        var cities, projection, r;
+        r = d3.scale.linear().domain(this.getDataMinMax()).range([3, 30]);
         projection = this.parentView.projection;
-        this.cities.selectAll("circle").data(data).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
+        cities = this.collection.toJSON();
+        this.cities.selectAll("circle").data(cities).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
           return r(d.value);
         }).attr("cx", function(d) {
           return projection([d.longitude, d.latitude])[0];
@@ -62,11 +62,9 @@
         return this;
       };
 
-      CitiesView.prototype.getRange = function(data) {
+      CitiesView.prototype.getDataMinMax = function() {
         var max, min, values;
-        values = data.map(function(city) {
-          return city.value;
-        });
+        values = this.collection.pluck('value');
         min = values.reduce(function(a, b) {
           return Math.min(a, b);
         });
