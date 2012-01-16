@@ -1,0 +1,49 @@
+body {
+    background-color: #111;
+    color: #eee;
+    font-family: Helvetica, Arial, FreeSans, san-serif;
+    overflow: hidden;
+    margin: 0;
+}
+
+#container {
+	margin: 0 auto;
+	width: 700px;
+}
+h1 { font-size: 1.8em; color: #d4ddde; margin-bottom: 3px; }
+h1 .small { font-size: 0.4em; }
+.description{
+	margin-bottom: 30px;
+}
+
+a {
+	color: #ef4d0d;
+}
+
+p {
+    color: #999;
+}
+
+#map {
+	width: 100%;
+	height: 100%;
+}
+
+/*svg map*/
+path {
+	stroke: #666;
+	fill: #333; 
+	stroke-width: 0.5;
+}
+
+circle {
+	fill: #ef4d0d;
+	opacity:.5;
+
+}
+
+circle:hover {
+	cursor:pointer;
+	opacity:.8;
+	fill: #30a3ec;
+}
