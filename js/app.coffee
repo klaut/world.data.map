@@ -11,7 +11,7 @@ jQuery ->
 			_.bindAll @
 
 			@parentView = @options.parentView
-			@cities = @parentView.map.append("svg:g").attr("id", "cities")
+			@cities = @parentView.map.append("svg:g").attr("id", "cities-#{@className}")
 
 			@collection = new Cities
 			@collection.reset @options.collectionData
@@ -20,19 +20,26 @@ jQuery ->
 		
 		render: ->
 			data = @collection.toJSON()
-			r = d3.scale.linear().domain([0,1]).range([5,10])
+			#get the right scale proportions for this dataset
+			r = d3.scale.linear().domain(@getRange(data)).range([3,30])
 			projection = @parentView.projection
 			
 			@cities.selectAll("circle")
 				.data( data )
 				.enter().append("svg:circle")
 				.attr("class", @className )
-				.attr("r", (d) -> Math.sqrt d.value )
+				.attr("r", (d) -> r(d.value) )
 				.attr("cx", (d) -> projection([d.longitude, d.latitude])[0] )
 				.attr("cy", (d) -> projection([d.longitude, d.latitude])[1] )
 				.append("svg:title")
 				.text((d) -> d.city)
 			@
+		
+		getRange: (data) ->
+			values = data.map (city) -> city.value
+			min = values.reduce (a,b) -> Math.min a,b
+			max = values.reduce (a,b) -> Math.max a,b
+			[min,max]
 		
 
 
@@ -66,8 +73,8 @@ jQuery ->
 			      .text((d) -> d.properties.name )
 			@
 		
-		addViewLayer: (data, viewClassString, cssClass) ->
-			view = new viewClassString collectionData:data, parentView:@, className:cssClass
+		addViewLayer: (data, viewClass, cssClass) ->
+			view = new viewClass collectionData:data, parentView:@, className:cssClass
 			@viewLayers.push view
 		
 		scaleWorldMap: ->

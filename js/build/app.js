@@ -39,7 +39,7 @@
       CitiesView.prototype.initialize = function() {
         _.bindAll(this);
         this.parentView = this.options.parentView;
-        this.cities = this.parentView.map.append("svg:g").attr("id", "cities");
+        this.cities = this.parentView.map.append("svg:g").attr("id", "cities-" + this.className);
         this.collection = new Cities;
         this.collection.reset(this.options.collectionData);
         return this.render();
@@ -48,10 +48,10 @@
       CitiesView.prototype.render = function() {
         var data, projection, r;
         data = this.collection.toJSON();
-        r = d3.scale.linear().domain([0, 1]).range([5, 10]);
+        r = d3.scale.linear().domain(this.getRange(data)).range([3, 30]);
         projection = this.parentView.projection;
         this.cities.selectAll("circle").data(data).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
-          return Math.sqrt(d.value);
+          return r(d.value);
         }).attr("cx", function(d) {
           return projection([d.longitude, d.latitude])[0];
         }).attr("cy", function(d) {
@@ -60,6 +60,20 @@
           return d.city;
         });
         return this;
+      };
+
+      CitiesView.prototype.getRange = function(data) {
+        var max, min, values;
+        values = data.map(function(city) {
+          return city.value;
+        });
+        min = values.reduce(function(a, b) {
+          return Math.min(a, b);
+        });
+        max = values.reduce(function(a, b) {
+          return Math.max(a, b);
+        });
+        return [min, max];
       };
 
       return CitiesView;
@@ -99,9 +113,9 @@
         return this;
       };
 
-      WorldView.prototype.addViewLayer = function(data, viewClassString, cssClass) {
+      WorldView.prototype.addViewLayer = function(data, viewClass, cssClass) {
         var view;
-        view = new viewClassString({
+        view = new viewClass({
           collectionData: data,
           parentView: this,
           className: cssClass

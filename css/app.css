@@ -22,19 +22,19 @@ path {
 	stroke-width: 0.5;
 }
 
+circle {
+	opacity:.4;
+}
+
 circle.firstLayer {
 	fill: #ef4d0d;
-	opacity:.5;
-
 }
 
 circle.secondLayer {
-	fill: #d456ef;
-	opacity:.5;
+	fill: #30a3ec;
 }
 
 circle:hover {
 	cursor:pointer;
-	opacity:.8;
-	fill: #30a3ec;
+	opacity:1;
 }
