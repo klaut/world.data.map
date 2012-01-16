@@ -1,11 +1,11 @@
 jQuery ->
 	
-	class Visitor extends Backbone.Model
+	class City extends Backbone.Model
 	
-	class Visitors extends Backbone.Collection
-		model: Visitor
+	class Cities extends Backbone.Collection
+		model: City
 	
-	class VisitorsView extends Backbone.View
+	class CitiesView extends Backbone.View
 
 		initialize: ->
 			_.bindAll @
@@ -13,7 +13,7 @@ jQuery ->
 			@parentView = @options.parentView
 			@cities = @parentView.map.append("svg:g").attr("id", "cities")
 
-			@collection = new Visitors
+			@collection = new Cities
 			@collection.reset @options.collectionData
 
 			@render()
@@ -26,9 +26,12 @@ jQuery ->
 			@cities.selectAll("circle")
 				.data( data )
 				.enter().append("svg:circle")
+				.attr("class", @className )
 				.attr("r", (d) -> Math.sqrt d.value )
-				.attr("cx", (d) -> projection([d.latitude, d.longitude])[0] )
-				.attr("cy", (d) -> projection([d.latitude, d.longitude])[1] )
+				.attr("cx", (d) -> projection([d.longitude, d.latitude])[0] )
+				.attr("cy", (d) -> projection([d.longitude, d.latitude])[1] )
+				.append("svg:title")
+				.text((d) -> d.city)
 			@
 		
 
@@ -63,8 +66,8 @@ jQuery ->
 			      .text((d) -> d.properties.name )
 			@
 		
-		addViewLayer: (data, viewClassString) ->
-			view = new viewClassString collectionData:data, parentView:@
+		addViewLayer: (data, viewClassString, cssClass) ->
+			view = new viewClassString collectionData:data, parentView:@, className:cssClass
 			@viewLayers.push view
 		
 		scaleWorldMap: ->
@@ -86,5 +89,6 @@ jQuery ->
 		success()
 
 	worldMap = new WorldView
-	worldMap.addViewLayer(cities, VisitorsView)
+	worldMap.addViewLayer(cities1, CitiesView, "firstLayer")
+	worldMap.addViewLayer(cities2, CitiesView, "secondLayer")
 

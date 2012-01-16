@@ -3,64 +3,66 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   jQuery(function() {
-    var Visitor, Visitors, VisitorsView, WorldView, worldMap;
-    Visitor = (function(_super) {
+    var Cities, CitiesView, City, WorldView, worldMap;
+    City = (function(_super) {
 
-      __extends(Visitor, _super);
+      __extends(City, _super);
 
-      function Visitor() {
-        Visitor.__super__.constructor.apply(this, arguments);
+      function City() {
+        City.__super__.constructor.apply(this, arguments);
       }
 
-      return Visitor;
+      return City;
 
     })(Backbone.Model);
-    Visitors = (function(_super) {
+    Cities = (function(_super) {
 
-      __extends(Visitors, _super);
+      __extends(Cities, _super);
 
-      function Visitors() {
-        Visitors.__super__.constructor.apply(this, arguments);
+      function Cities() {
+        Cities.__super__.constructor.apply(this, arguments);
       }
 
-      Visitors.prototype.model = Visitor;
+      Cities.prototype.model = City;
 
-      return Visitors;
+      return Cities;
 
     })(Backbone.Collection);
-    VisitorsView = (function(_super) {
+    CitiesView = (function(_super) {
 
-      __extends(VisitorsView, _super);
+      __extends(CitiesView, _super);
 
-      function VisitorsView() {
-        VisitorsView.__super__.constructor.apply(this, arguments);
+      function CitiesView() {
+        CitiesView.__super__.constructor.apply(this, arguments);
       }
 
-      VisitorsView.prototype.initialize = function() {
+      CitiesView.prototype.initialize = function() {
         _.bindAll(this);
         this.parentView = this.options.parentView;
         this.cities = this.parentView.map.append("svg:g").attr("id", "cities");
-        this.collection = new Visitors;
+        this.collection = new Cities;
         this.collection.reset(this.options.collectionData);
         return this.render();
       };
 
-      VisitorsView.prototype.render = function() {
+      CitiesView.prototype.render = function() {
         var data, projection, r;
         data = this.collection.toJSON();
         r = d3.scale.linear().domain([0, 1]).range([5, 10]);
         projection = this.parentView.projection;
-        this.cities.selectAll("circle").data(data).enter().append("svg:circle").attr("r", function(d) {
+        this.cities.selectAll("circle").data(data).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
           return Math.sqrt(d.value);
         }).attr("cx", function(d) {
-          return projection([d.latitude, d.longitude])[0];
+          return projection([d.longitude, d.latitude])[0];
         }).attr("cy", function(d) {
-          return projection([d.latitude, d.longitude])[1];
+          return projection([d.longitude, d.latitude])[1];
+        }).append("svg:title").text(function(d) {
+          return d.city;
         });
         return this;
       };
 
-      return VisitorsView;
+      return CitiesView;
 
     })(Backbone.View);
     WorldView = (function(_super) {
@@ -97,11 +99,12 @@
         return this;
       };
 
-      WorldView.prototype.addViewLayer = function(data, viewClassString) {
+      WorldView.prototype.addViewLayer = function(data, viewClassString, cssClass) {
         var view;
         view = new viewClassString({
           collectionData: data,
-          parentView: this
+          parentView: this,
+          className: cssClass
         });
         return this.viewLayers.push(view);
       };
@@ -126,7 +129,8 @@
       return success();
     };
     worldMap = new WorldView;
-    return worldMap.addViewLayer(cities, VisitorsView);
+    worldMap.addViewLayer(cities1, CitiesView, "firstLayer");
+    return worldMap.addViewLayer(cities2, CitiesView, "secondLayer");
   });
 
 }).call(this);
