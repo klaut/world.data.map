@@ -3,7 +3,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   jQuery(function() {
-    var Cities, CitiesView, City, WorldView, worldMap;
+    var Cities, CitiesView, City, CityDetail, WorldView, worldMap;
     City = (function(_super) {
 
       __extends(City, _super);
@@ -15,6 +15,17 @@
       return City;
 
     })(Backbone.Model);
+    CityDetail = (function(_super) {
+
+      __extends(CityDetail, _super);
+
+      function CityDetail() {
+        CityDetail.__super__.constructor.apply(this, arguments);
+      }
+
+      return CityDetail;
+
+    })(Backbone.View);
     Cities = (function(_super) {
 
       __extends(Cities, _super);
@@ -36,21 +47,23 @@
         CitiesView.__super__.constructor.apply(this, arguments);
       }
 
+      CitiesView.prototype.tagName = 'g';
+
       CitiesView.prototype.initialize = function() {
         _.bindAll(this);
         this.parentView = this.options.parentView;
-        this.cities = this.parentView.map.append("svg:g").attr("id", "cities-" + this.className);
+        this.el = this.parentView.map.append("svg:g").attr("id", "cities-" + this.className);
         this.collection = new Cities;
         this.collection.reset(this.options.collectionData);
         return this.render();
       };
 
       CitiesView.prototype.render = function() {
-        var cities, projection, r;
+        var citydata, projection, r;
         r = d3.scale.linear().domain(this.getDataMinMax()).range([3, 30]);
         projection = this.parentView.projection;
-        cities = this.collection.toJSON();
-        this.cities.selectAll("circle").data(cities).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
+        citydata = this.collection.toJSON();
+        this.el.selectAll("circle").data(citydata).enter().append("svg:circle").attr("class", this.className).attr("r", function(d) {
           return r(d.value);
         }).attr("cx", function(d) {
           return projection([d.longitude, d.latitude])[0];

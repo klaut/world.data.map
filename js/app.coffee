@@ -1,17 +1,20 @@
 jQuery ->
 	
 	class City extends Backbone.Model
+
+	class CityDetail extends Backbone.View
 	
 	class Cities extends Backbone.Collection
 		model: City
 	
 	class CitiesView extends Backbone.View
+		tagName: 'g'
 
 		initialize: ->
 			_.bindAll @
 
 			@parentView = @options.parentView
-			@cities = @parentView.map.append("svg:g").attr("id", "cities-#{@className}")
+			@el = @parentView.map.append("svg:g").attr("id", "cities-#{@className}")
 
 			@collection = new Cities
 			@collection.reset @options.collectionData
@@ -23,10 +26,10 @@ jQuery ->
 			r = d3.scale.linear().domain(@getDataMinMax()).range([3,30])
 			projection = @parentView.projection
 
-			cities = @collection.toJSON()
+			citydata = @collection.toJSON()
 			
-			@cities.selectAll("circle")
-				.data( cities )
+			@el.selectAll("circle")
+				.data( citydata )
 				.enter().append("svg:circle")
 				.attr("class", @className )
 				.attr("r", (d) -> r(d.value) )
