@@ -10,12 +10,53 @@ p {
     color: #999;
 }
 
+#container {
+	margin: 0 auto;
+	/*width: 960px;
+	height: 520px;*/
+}
+
 #map {
 	width: 100%;
 	height: 100%;
 }
 
+.city-detail {
+	min-width: 100px;
+	border: 3px solid #bbb;
+	border-radius: 10px;
+
+	position: absolute;
+	display: none;
+
+	font-size: 14px;
+    font-style: italic;
+	font-weight:bold;
+    color: #777;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(255,255,255,.65);
+
+	background:-moz-linear-gradient(top, #FFFFFF 0%, #DFDBDB 100%); /* FF3.6+ */
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFFFFF), color-stop(100%,#DFDBDB)); /* Chrome,Safari4+ */
+    background:-webkit-linear-gradient(top, #FFFFFF 0%,#DFDBDB 100%); /* Chrome10+,Safari5.1+ */
+    background:-o-linear-gradient(top, #FFFFFF 0%,#DFDBDB 100%); /* Opera11.10+ */
+    background:-ms-linear-gradient(top, #FFFFFF 0%,#DFDBDB 100%); /* IE10+ */
+    background:linear-gradient(top, #FFFFFF 0%,#DFDBDB 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#DFDBDB');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#DFDBDB')";
+}
+.city-detail .pad { padding: 10px 10px 5px; }
+
+.city-detail .value {
+    font-size: 28px;
+    font-style: normal;
+    color: #444;
+    display: block;
+    margin-bottom: .4em;
+}
+
 /*svg map*/
+
 path {
 	stroke: #666;
 	fill: #333; 
@@ -26,12 +67,14 @@ circle {
 	opacity:.4;
 }
 
-circle.firstLayer {
+.firstLayer {
 	fill: #ef4d0d;
+	border-color: #ef4d0d;
 }
 
-circle.secondLayer {
+.secondLayer {
 	fill: #30a3ec;
+	border-color: #30a3ec;
 }
 
 circle:hover {

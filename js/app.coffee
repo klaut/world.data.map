@@ -3,6 +3,17 @@ jQuery ->
 	class City extends Backbone.Model
 
 	class CityDetail extends Backbone.View
+		tagName: 'div'
+		className: 'city-detail'
+		template: _.template($('#city-detail-tmp').html())
+
+		initialize: ->
+			_.bindAll @
+		
+		render: ->
+			$(@el).html(@template(@model.toJSON()))
+			@
+
 	
 	class Cities extends Backbone.Collection
 		model: City
@@ -22,21 +33,21 @@ jQuery ->
 			@render()
 		
 		render: ->
-			#get the right scale proportions for this dataset
-			r = d3.scale.linear().domain(@getDataMinMax()).range([3,30])
+			r = d3.scale.linear().domain(@getDataMinMax()).range([3,20])
 			projection = @parentView.projection
-
-			citydata = @collection.toJSON()
+			self = @
 			
 			@el.selectAll("circle")
-				.data( citydata )
+				.data( @collection.models )
 				.enter().append("svg:circle")
 				.attr("class", @className )
-				.attr("r", (d) -> r(d.value) )
-				.attr("cx", (d) -> projection([d.longitude, d.latitude])[0] )
-				.attr("cy", (d) -> projection([d.longitude, d.latitude])[1] )
-				.append("svg:title")
-				.text((d) -> d.city)
+				.attr("id", (d) -> d.cid )
+				.attr("r", (d) -> r(d.get 'value') )
+				.attr("cx", (d) -> projection([d.get('longitude'), d.get('latitude')])[0] )
+				.attr("cy", (d) -> projection([d.get('longitude'), d.get('latitude')])[1] )
+				.on("mouseover", (d) -> self.showDetail(d, @))
+				.on("mouseout", (d) -> self.hideDetail(d, @))
+			
 			@
 		
 		getDataMinMax: ->
@@ -45,6 +56,24 @@ jQuery ->
 			max = values.reduce (a,b) -> Math.max a,b
 			[min,max]
 		
+		showDetail: (city, dot) ->		
+			@cityDetail = new CityDetail model:city
+			rendered = @cityDetail.render().el
+			$(@parentView.el).append rendered
+
+			{left:x, top:y} = $(dot).offset()
+			r = (Math.ceil $(dot).attr('r'))
+			[x,y] = [x+r, y+r]
+			yOffset = r + $(rendered).outerHeight() + 10
+
+			$(rendered).css("top", y - yOffset)
+			$(rendered).css("left", x - ($(rendered).outerWidth()/2))
+			$(rendered).addClass $(dot).attr('class')
+
+			$(rendered).fadeIn('fast')
+		
+		hideDetail: (city) ->
+			$(@cityDetail.el).fadeOut( 'fast', -> $(@).remove() )
 
 
 	class WorldView extends Backbone.View
@@ -60,10 +89,16 @@ jQuery ->
 			@projection = d3.geo.mercator().scale(1).translate([0, 0])
 			@path = d3.geo.path().projection(@projection)
 
+			width = $(@el).width() or $(window).width()
+			height = $(@el).height() or $(window).height()
+
 			@map = d3.select("#" + $(@el).attr('id')).append("svg:svg")
+							.attr("height","100%") 
+    						.attr("width","100%") 
+    						.attr("viewBox","0 0 #{width} #{height}")
 			@world = @map.append("svg:g").attr("id", "world")
 
-			@scaleWorldMap()
+			@scaleWorldMap([width, height])
 
 			@render()
 		
@@ -73,7 +108,7 @@ jQuery ->
 			    .enter().append('svg:path')
 			      .attr('id', (d) -> d.id )
 			      .attr('d', @path)
-			    .append('svg:title')
+			      .append('svg:title')
 			      .text((d) -> d.properties.name )
 			@
 		
@@ -81,10 +116,7 @@ jQuery ->
 			view = new viewClass collectionData:data, parentView:@, className:cssClass
 			@viewLayers.push view
 		
-		scaleWorldMap: ->
-			width = $(@el).width()
-			height = $(@el).height()
-
+		scaleWorldMap: ([width, height])->
 			bounds0 = d3.geo.bounds(@geojson_paths)
 			bounds = bounds0.map(@projection)
 			xscale = width/Math.abs(bounds[1][0] - bounds[0][0])
@@ -102,4 +134,3 @@ jQuery ->
 	worldMap = new WorldView
 	worldMap.addViewLayer(cities1, CitiesView, "firstLayer")
 	worldMap.addViewLayer(cities2, CitiesView, "secondLayer")
-
